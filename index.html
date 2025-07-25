@@ -55,7 +55,6 @@
           <option value="off DO">off DO</option>
           <option value="off OT+DO">off OT+DO</option>
           <option value="Vacation">Vacation</option>
-          <option value="ลาป่วย">ลาป่วย</option>
           <option value="เวร M">เวร M</option>
         </select>
       </div>
@@ -86,10 +85,10 @@
   maxDate.setDate(today.getDate() + 60);
   dateInput.setAttribute("max", maxDate.toISOString().split("T")[0]);
 
-  function setCurrentTime() {
-    const now = new Date();
-    timeInput.value = now.toTimeString().slice(0, 5); // HH:MM
-  }
+function setCurrentTime() {
+  timeInput.value = "00:00"; // ตั้งเวลาเป็น 00:00 เสมอ
+}
+
 
   function getNextID() {
     let lastId = localStorage.getItem("lastFormId");
