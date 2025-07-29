@@ -39,7 +39,6 @@
   <div class="overlay">
     <h2 class="text-center mb-4">ฟอร์มขอเวร OPD ENT</h2>
     <form id="shiftForm">
-      <!-- ลำดับ (auto-increment) -->
       <input type="hidden" name="id" id="idField" />
 
       <div class="mb-3">
@@ -73,97 +72,83 @@
   </div>
 
   <script>
-  const dateInput = document.getElementById("dateInput");
-  const timeInput = document.getElementById("timeInput");
-  const idField = document.getElementById("idField");
-  const submitBtn = document.getElementById("submitBtn");
+    const dateInput = document.getElementById("dateInput");
+    const timeInput = document.getElementById("timeInput");
+    const idField = document.getElementById("idField");
+    const submitBtn = document.getElementById("submitBtn");
 
-  // จำกัดวัน
-  const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
-  dateInput.setAttribute("min", todayStr);
-  const maxDate = new Date();
-  maxDate.setDate(today.getDate() + 60);
-  dateInput.setAttribute("max", maxDate.toISOString().split("T")[0]);
+    // จำกัดวัน
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+    dateInput.setAttribute("min", todayStr);
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 60);
+    dateInput.setAttribute("max", maxDate.toISOString().split("T")[0]);
 
-function setCurrentTime() {
-  timeInput.value = "00:00"; // ตั้งเวลาเป็น 00:00 เสมอ
-}
-
-
-  function getNextID() {
-    let lastId = localStorage.getItem("lastFormId");
-    if (!lastId) lastId = 0;
-    const nextId = parseInt(lastId) + 1;
-    localStorage.setItem("lastFormId", nextId);
-    return nextId;
-  }
-
-  document.getElementById("shiftForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
-    
-    // ป้องกันการกดซ้ำ
-    if (submitBtn.disabled) return;
-
-    setCurrentTime();
-
-    const formData = new FormData(e.target);
-    formData.set("id", getNextID());
-    const data = Object.fromEntries(formData.entries());
-
-    const selectedDate = new Date(data.date);
-    const selectedDateTime = new Date(`${data.date}T${data.time}`);
-    const now = new Date();
-
-    if (selectedDate.toDateString() === now.toDateString() && selectedDateTime < now) {
-      Swal.fire({
-        icon: "error",
-        title: "เวลาไม่ถูกต้อง",
-        text: "ไม่สามารถเลือกเวลาย้อนหลังได้",
-      });
-      return;
+    function setCurrentTime() {
+      timeInput.value = "00:00"; // ตั้งเวลาเป็น 00:00 เสมอ
     }
 
-    // 🔒 ล็อกปุ่ม
-    submitBtn.disabled = true;
-    submitBtn.innerText = "กำลังส่ง...";
+    function getNextID() {
+      let lastId = localStorage.getItem("lastFormId");
+      if (!lastId) lastId = 0;
+      const nextId = parseInt(lastId) + 1;
+      localStorage.setItem("lastFormId", nextId);
+      return nextId;
+    }
 
-    try {
-      await fetch(
-        "https://script.google.com/macros/s/AKfycbyaF-bH0VO0k6YDgMq3qAfJf9gJIwuOKewx_4veQMUGU9VhsmeWlnaeF1FAtD4tRCgV/exec",
-        {
-          method: "POST",
-          mode: "no-cors",
-          body: JSON.stringify(data),
-        }
-      );
+    document.getElementById("shiftForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-      Swal.fire({
-        icon: "success",
-        title: "ส่งข้อมูลเรียบร้อยแล้ว 🙏",
-        showConfirmButton: false,
-        timer: 2000,
-      });
+      // ป้องกันการกดซ้ำ
+      if (submitBtn.disabled) return;
 
-      e.target.reset();
       setCurrentTime();
-      idField.value = getNextID(); // รีเซ็ต ID
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "เกิดข้อผิดพลาด",
-        text: "กรุณาลองใหม่อีกครั้ง",
-      });
-    } finally {
-      // 🔓 ปลดล็อกปุ่ม
-      submitBtn.disabled = false;
-      submitBtn.innerText = "ส่งข้อมูล";
-    }
-  });
 
-  // ตั้งค่าเริ่มต้น
-  setCurrentTime();
-  idField.value = getNextID();
-</script>
+      const formData = new FormData(e.target);
+      formData.set("id", getNextID());
+      const data = Object.fromEntries(formData.entries());
+
+      // 🔒 ล็อกปุ่ม
+      submitBtn.disabled = true;
+      submitBtn.innerText = "กำลังส่ง...";
+
+      try {
+        await fetch(
+          "https://script.google.com/macros/s/AKfycbyaF-bH0VO0k6YDgMq3qAfJf9gJIwuOKewx_4veQMUGU9VhsmeWlnaeF1FAtD4tRCgV/exec",
+          {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify(data),
+          }
+        );
+
+        Swal.fire({
+          icon: "success",
+          title: "ส่งข้อมูลเรียบร้อยแล้ว 🙏",
+          showConfirmButton: false,
+          timer: 2000,
+        });
+
+        e.target.reset();
+        setCurrentTime();
+        idField.value = getNextID(); // รีเซ็ต ID
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "เกิดข้อผิดพลาด",
+          text: "กรุณาลองใหม่อีกครั้ง",
+        });
+      } finally {
+        // 🔓 ปลดล็อกปุ่ม
+        submitBtn.disabled = false;
+        submitBtn.innerText = "ส่งข้อมูล";
+      }
+    });
+
+    // ตั้งค่าเริ่มต้น
+    setCurrentTime();
+    idField.value = getNextID();
+  </script>
 </body>
 </html>
