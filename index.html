@@ -82,7 +82,7 @@
     const todayStr = today.toISOString().split("T")[0];
     dateInput.setAttribute("min", todayStr);
     const maxDate = new Date();
-    maxDate.setDate(today.getDate() + 60);
+    maxDate.setDate(today.getDate() + 62);
     dateInput.setAttribute("max", maxDate.toISOString().split("T")[0]);
 
     function setCurrentTime() {
