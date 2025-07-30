@@ -72,18 +72,26 @@
   </div>
 
   <script>
-    const dateInput = document.getElementById("dateInput");
-    const timeInput = document.getElementById("timeInput");
-    const idField = document.getElementById("idField");
-    const submitBtn = document.getElementById("submitBtn");
+  const dateInput = document.getElementById("dateInput");
+  const timeInput = document.getElementById("timeInput");
+  const idField = document.getElementById("idField");
+  const submitBtn = document.getElementById("submitBtn");
 
-    // จำกัดวัน
-    const today = new Date();
-    const todayStr = today.toISOString().split("T")[0];
-    dateInput.setAttribute("min", todayStr);
-    const maxDate = new Date();
-    maxDate.setDate(today.getDate() + 62);
-    dateInput.setAttribute("max", maxDate.toISOString().split("T")[0]);
+  // ✅ จำกัดวัน: วันนี้ถึงอีก 2 เดือนแบบวันชนวัน
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0];
+  dateInput.setAttribute("min", todayStr);
+
+  const maxDate = new Date(today);
+  maxDate.setMonth(maxDate.getMonth() + 2);
+
+  // ตรวจสอบหากวันของ maxDate ไม่เท่ากับวันนี้ (เช่นกรณี 31 มี.ค. → พ.ค. มี 30 วัน)
+  if (maxDate.getDate() !== today.getDate()) {
+    maxDate.setDate(0); // ใช้วันสุดท้ายของเดือนก่อนหน้า
+  }
+
+  const maxStr = maxDate.toISOString().split("T")[0];
+  dateInput.setAttribute("max", maxStr);
 
     function setCurrentTime() {
       timeInput.value = "00:00"; // ตั้งเวลาเป็น 00:00 เสมอ
